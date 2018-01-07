@@ -29,7 +29,7 @@ exports.handler = (event, context) => {
       "dance with",
       "give a ten second back massage to",
       "high five with",
-      "take one random card from"
+      "take one random card from",
       "take a selfie with",
       "swap places with",
       "swap hands with",
