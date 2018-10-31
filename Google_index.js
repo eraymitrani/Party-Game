@@ -6,7 +6,7 @@ const DialogflowApp = require('actions-on-google').DialogflowApp; // Google Assi
 const googleAssistantRequest = 'google'; // Constant to identify Google Assistant requests
 var suits = ["spades", "hearts", "clubs", "diamonds"];
 var ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King", "Ace"];
-   var soloActions = [
+    var soloActions = [
       "stand up",
       "squat for 15 seconds or drink",
       "sit down",
