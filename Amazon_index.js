@@ -142,7 +142,6 @@ exports.handler = (event, context) => {
                   shouldEndSession: true
                 }
               });
-              buildResponse(context, "One expansion pack coming your way!", false);
             }
             break;
           case "AMAZON.HelpIntent":
