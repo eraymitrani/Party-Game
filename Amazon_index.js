@@ -120,7 +120,12 @@ exports.handler = (event, context) => {
             buildResponse(context, exitResponses[randomNum], true);
             break;
           case "BuySkillItemIntent":
-            buildResponse(context, "Successfuly invoked buy skill item intent!", false);
+            if (!event.request.intent.slots) {
+              buildResponse(context, "No product information", false);  
+            }
+            else {
+              buildResponse(context, "Yes product information", false);  
+            }
             break;
           case "AMAZON.HelpIntent":
             buildResponse(context, "Deal an entire deck of cards to all players. " +
