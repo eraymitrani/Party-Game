@@ -121,10 +121,28 @@ exports.handler = (event, context) => {
             break;
           case "BuySkillItemIntent":
             if (!event.request.intent.slots.ProductName.value) {
-              buildResponse(context, "No product information", false);  
+              buildResponse(context, "I have an expansion pack available called Party Game Plus. If you would like to buy it, say: Buy Party Game Plus.", false);  
             }
             else {
-              buildResponse(context, "Yes product information", false);  
+              return {
+                'version': '1.0',
+                'response': {
+                  'directives': [
+                    {
+                      'type': 'Connections.SendRequest',
+                      'name': 'Buy',
+                      'payload': {
+                                 'InSkillProduct': {
+                                                   'productId': 'amzn1.adg.product.aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
+                                 }
+                         },
+                        'token': 'someRandomCorrelationToken'
+                    }
+                  ],
+                  'shouldEndSession': true
+                }
+              }
+              //buildResponse(context, "One expansion pack coming your way!", false);  
             }
             break;
           case "AMAZON.HelpIntent":
