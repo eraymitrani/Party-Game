@@ -133,7 +133,7 @@ exports.handler = (event, context) => {
                       'name': 'Buy',
                       'payload': {
                         'InSkillProduct': {
-                          'productId': 'amzn1.adg.product.aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
+                          'productId': 'amzn1.adg.product.4a967b61-6d2c-4f83-97f9-c97a6aa7bd7a'
                         }
                       },
                       'token': 'someRandomCorrelationToken'
