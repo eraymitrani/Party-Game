@@ -120,7 +120,7 @@ exports.handler = (event, context) => {
             buildResponse(context, exitResponses[randomNum], true);
             break;
           case "BuySkillItemIntent":
-            if (!event.request.intent.slots) {
+            if (!event.request.intent.slots.ProductName.value) {
               buildResponse(context, "No product information", false);  
             }
             else {
