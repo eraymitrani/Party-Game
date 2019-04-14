@@ -158,6 +158,7 @@ exports.handler = (event, context) => {
             buildResponse(context,"",true);
             break;          
           default:
+            buildResponse(context,"Invalid intent",true);
             throw "Invalid intent"
         }
         break;
@@ -166,8 +167,7 @@ exports.handler = (event, context) => {
         console.log(`SESSION ENDED REQUEST`)
         break;
       default:
-        buildResponse(context,"Invalid intent",true);
-        // context.fail(`INVALID REQUEST TYPE: ${event.request.type}`)
+        context.fail(`INVALID REQUEST TYPE: ${event.request.type}`)
 
     }
 
