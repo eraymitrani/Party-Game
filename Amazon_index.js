@@ -121,27 +121,27 @@ exports.handler = (event, context) => {
             break;
           case "BuySkillItemIntent":
             if (!event.request.intent.slots.ProductName.value) {
-              buildResponse(context, "I have an expansion pack available called Party Game Plus. If you would like to buy it, say: Buy Party Game Plus.", false);  
+              buildResponse(context, "I have an expansion pack available called Party Game Plus. If you would like to buy it, say: Buy Party Game Plus.", false);
             }
             else {
-              context.succeed( {
-                version: '1.0',
-                response: {
-                  directives: [
-                    {
-                      type: 'Connections.SendRequest',
-                      name: 'Buy',
-                      payload: {
-                        InSkillProduct: {
-                          productId: 'amzn1.adg.product.4a967b61-6d2c-4f83-97f9-c97a6aa7bd7a'
-                        }
-                      },
-                      token: 'someRandomCorrelationToken'
-                    }
-                  ],
-                  shouldEndSession: true
-                }
-              });
+              // context.succeed( {
+              //   version: '1.0',
+              //   response: {
+              //     directives: [
+              //       {
+              //         type: 'Connections.SendRequest',
+              //         name: 'Buy',
+              //         payload: {
+              //           InSkillProduct: {
+              //             productId: 'amzn1.adg.product.4a967b61-6d2c-4f83-97f9-c97a6aa7bd7a'
+              //           }
+              //         },
+              //         token: 'someRandomCorrelationToken'
+              //       }
+              //     ],
+              //     shouldEndSession: true
+              //   }
+              // });
             }
             break;
           case "AMAZON.HelpIntent":
