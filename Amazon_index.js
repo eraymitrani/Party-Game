@@ -124,7 +124,7 @@ exports.handler = (event, context) => {
               buildResponse(context, "I have an expansion pack available called Party Game Plus. If you would like to buy it, say: Buy Party Game Plus.", false);  
             }
             else {
-              return {
+              context.succeed( {
                 'version': '1.0',
                 'response': {
                   'directives': [
@@ -132,16 +132,16 @@ exports.handler = (event, context) => {
                       'type': 'Connections.SendRequest',
                       'name': 'Buy',
                       'payload': {
-                                 'InSkillProduct': {
-                                                   'productId': 'amzn1.adg.product.aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
-                                 }
-                         },
-                        'token': 'someRandomCorrelationToken'
+                        'InSkillProduct': {
+                          'productId': 'amzn1.adg.product.aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
+                        }
+                      },
+                      'token': 'someRandomCorrelationToken'
                     }
                   ],
                   'shouldEndSession': true
                 }
-              }
+              });
               //buildResponse(context, "One expansion pack coming your way!", false);  
             }
             break;
