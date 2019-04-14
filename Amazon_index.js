@@ -119,6 +119,9 @@ exports.handler = (event, context) => {
             var randomNum = getRandomInt(0, exitResponses.length);
             buildResponse(context, exitResponses[randomNum], true);
             break;
+          case "BuySkillItemIntent":
+            buildResponse(context, "Successfuly invoked buy skill item intent!", false);
+            break;
           case "AMAZON.HelpIntent":
             buildResponse(context, "Deal an entire deck of cards to all players. " +
               "Wait for everyone to sort their hands and sit down. " + 
