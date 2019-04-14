@@ -125,21 +125,21 @@ exports.handler = (event, context) => {
             }
             else {
               context.succeed( {
-                'version': '1.0',
-                'response': {
-                  'directives': [
+                version: '1.0',
+                response: {
+                  directives: [
                     {
-                      'type': 'Connections.SendRequest',
-                      'name': 'Buy',
-                      'payload': {
-                        'InSkillProduct': {
-                          'productId': 'amzn1.adg.product.4a967b61-6d2c-4f83-97f9-c97a6aa7bd7a'
+                      type: 'Connections.SendRequest',
+                      name: 'Buy',
+                      payload: {
+                        InSkillProduct: {
+                          productId: 'amzn1.adg.product.4a967b61-6d2c-4f83-97f9-c97a6aa7bd7a'
                         }
                       },
-                      'token': 'someRandomCorrelationToken'
+                      token: 'someRandomCorrelationToken'
                     }
                   ],
-                  'shouldEndSession': true
+                  shouldEndSession: true
                 }
               });
               //buildResponse(context, "One expansion pack coming your way!", false);  
