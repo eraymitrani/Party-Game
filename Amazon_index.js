@@ -77,8 +77,8 @@ exports.handler = (event, context) => {
 
         switch(event.request.intent.name) {
           case "AMAZON.YesIntent":
-
-            getProductsAndEntitlements(this, handleYesIntent);
+            event.attributes = [];
+            getProductsAndEntitlements(event, handleYesIntent);
             break;
           case "AMAZON.NoIntent":
             var exitResponses = [
@@ -203,20 +203,21 @@ buildReprompt = (context, output) => {
   );
 }
 
-function getProductsAndEntitlements(self, callback) {
-    if (self.attributes.areProductsLoaded === undefined) {
-      self.attributes.areProductsLoaded = false;
+function getProductsAndEntitlements(event, callback) {
+  console.log(event);
+    if (event.attributes.areProductsLoaded === undefined) {
+      event.attributes.areProductsLoaded = false;
     }
     // Invoke the entitlement API to load products only if not already cached
-    if (!self.attributes.areProductsLoaded)    {
-        self.attributes.inSkillProducts = [];
+    if (!event.attributes.areProductsLoaded)    {
+        event.attributes.inSkillProducts = [];
         var returnData = [];
 
         // Information required to invoke the API is available in the session
         const https = require('https');
         const apiEndpoint = "api.amazonalexa.com";
-        const token  = "bearer " + self.event.context.System.apiAccessToken;
-        const language    = self.event.request.locale;
+        const token  = "bearer " + event.context.System.apiAccessToken;
+        const language    = event.request.locale;
 
         // The API path
         const apiPath     = "/v1/users/~current/skills/~current/inSkillProducts";
@@ -238,7 +239,7 @@ function getProductsAndEntitlements(self, callback) {
 
             if(res.statusCode != 200)   {
                 console.log("InSkillProducts returned status code " + res.statusCode);
-                self.emit(":tell", "Something went wrong in loading the purchase history. Error code " + res.code );
+                // self.emit(":tell", "Something went wrong in loading the purchase history. Error code " + res.code );
             }
 
             res.on('data', (chunk) => {
@@ -249,24 +250,24 @@ function getProductsAndEntitlements(self, callback) {
             res.on('end', () => {
                 var inSkillProductInfo = JSON.parse(returnData);
                 if(Array.isArray(inSkillProductInfo.inSkillProducts))  
-                    self.attributes.InSkillProducts = inSkillProductInfo.inSkillProducts;
+                    event.attributes.InSkillProducts = inSkillProductInfo.inSkillProducts;
                 else
-                    self.attributes.InSkillProducts=[];
+                    event.attributes.InSkillProducts=[];
 
-                console.log("Product list loaded:" + JSON.stringify(self.attributes.InSkillProducts));
-                callback(self, self.attributes.InSkillProducts);
+                console.log("Product list loaded:" + JSON.stringify(event.attributes.InSkillProducts));
+                callback(event, event.attributes.InSkillProducts);
             });   
         });
 
         req.on('error', (e) => {
             console.log('Error calling InSkillProducts API: ' + e.message);
-            self.emit(":tell", "Something went wrong in loading the product list. Error code " + e.code + ", message is " + e.message);
+            // self.emit(":tell", "Something went wrong in loading the product list. Error code " + e.code + ", message is " + e.message);
         });
 
     } // End if (!self.attributes.areProductsLoaded) {}
     else    {
         console.log("Product info already loaded.");
-        callback(self, self.attributes.InSkillProducts);
+        callback(event, event.attributes.InSkillProducts);
         return;
     }
 }
