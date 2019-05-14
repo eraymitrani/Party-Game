@@ -77,35 +77,8 @@ exports.handler = (event, context) => {
 
         switch(event.request.intent.name) {
           case "AMAZON.YesIntent":
-            var totalOptions = soloActions.length + doubleActions.length + groupActions.length + miniGameActions.length;
 
-            var randomNum = getRandomInt(0, totalOptions);
-            var remainingOptions = totalOptions - soloActions.length;
-            if (randomNum >= remainingOptions) { // Single
-              var actionIndex = getRandomInt(0, soloActions.length);
-              buildResponse(context, "If you have, " + 
-                getRandomCard(suits, ranks) + ", " + soloActions[actionIndex] + 
-                ". Next?", false);
-            }
-            remainingOptions = remainingOptions - doubleActions.length;
-            if (randomNum >= remainingOptions) { // Double
-              var actionIndex = getRandomInt(0, doubleActions.length); 
-              buildResponse(context, "If you have, " + 
-                getRandomCard(suits, ranks) + ", " + doubleActions[actionIndex] + 
-                " the person who has " + getRandomCard(suits, ranks) + ". Next?", false);
-            }
-            remainingOptions = remainingOptions - groupActions.length;
-            if (randomNum >= remainingOptions) { // Group
-              var actionIndex = getRandomInt(0, groupActions.length); 
-              buildResponse(context, groupActions[actionIndex] + " Next?", false);
-            }
-            remainingOptions = remainingOptions - miniGameActions.length;
-            if (randomNum >= remainingOptions) { // Versus
-              var actionIndex = getRandomInt(0, miniGameActions.length);
-              buildResponse(context, "Loser drinks! The person who has " + getRandomCard(suits, ranks) + 
-                ", " + miniGameActions[actionIndex] + " the person who has " + 
-                getRandomCard(suits, ranks) + ". Next?", false);
-            }
+            getProductsAndEntitlements(this, handleYesIntent);
             break;
           case "AMAZON.NoIntent":
             var exitResponses = [
@@ -230,6 +203,71 @@ buildReprompt = (context, output) => {
   );
 }
 
+function getProductsAndEntitlements(self, callback) {
+// Invoke the entitlement API to load products only if not already cached
+    if (!self.attributes.areProductsLoaded)    {
+        self.attributes.inSkillProducts = [];
+        var returnData = [];
+
+        // Information required to invoke the API is available in the session
+        const https = require('https');
+        const apiEndpoint = "api.amazonalexa.com";
+        const token  = "bearer " + self.event.context.System.apiAccessToken;
+        const language    = self.event.request.locale;
+
+        // The API path
+        const apiPath     = "/v1/users/~current/skills/~current/inSkillProducts";
+
+        const options = {
+            host: apiEndpoint,
+            path: apiPath,
+            method: 'GET',
+            headers: {
+                "Content-Type"      : 'application/json',
+                "Accept-Language"   : language,
+                "Authorization"     : token
+            }
+        };
+
+        // Call the API
+            const req = https.get(options, (res) => {
+            res.setEncoding("utf8");
+
+            if(res.statusCode != 200)   {
+                console.log("InSkillProducts returned status code " + res.statusCode);
+                self.emit(":tell", "Something went wrong in loading the purchase history. Error code " + res.code );
+            }
+
+            res.on('data', (chunk) => {
+                console.log("Chunk:" + chunk);
+                    returnData += chunk;
+            });
+
+            res.on('end', () => {
+                var inSkillProductInfo = JSON.parse(returnData);
+                if(Array.isArray(inSkillProductInfo.inSkillProducts))  
+                    self.attributes.InSkillProducts = inSkillProductInfo.inSkillProducts;
+                else
+                    self.attributes.InSkillProducts=[];
+
+                console.log("Product list loaded:" + JSON.stringify(self.attributes.InSkillProducts));
+                callback(self, self.attributes.InSkillProducts);
+            });   
+        });
+
+        req.on('error', (e) => {
+            console.log('Error calling InSkillProducts API: ' + e.message);
+            self.emit(":tell", "Something went wrong in loading the product list. Error code " + e.code + ", message is " + e.message);
+        });
+
+    } // End if (!self.attributes.areProductsLoaded) {}
+    else    {
+        console.log("Product info already loaded.");
+        callback(self, self.attributes.InSkillProducts);
+        return;
+    }
+}
+
 function getRandomCard(suits, ranks) {
   var randomRankIndex = getRandomInt(0, ranks.length);
   var randomSuitIndex = getRandomInt(0, suits.length);
@@ -238,4 +276,43 @@ function getRandomCard(suits, ranks) {
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function handleYesIntent(self, inSkillProductList) {
+    if (!inSkillProductList)    {
+        console.log("Something went wrong in loading product list.");
+    }
+    // Do something with the retrieved product list
+    for (var idx = 0; idx < inSkillProductList.length; idx ++)   {
+        console.log("inSkillProductList[" + idx + "] is:" + JSON.stringify(inSkillProductList[idx]));
+    }
+    var totalOptions = soloActions.length + doubleActions.length + groupActions.length + miniGameActions.length;
+
+    var randomNum = getRandomInt(0, totalOptions);
+    var remainingOptions = totalOptions - soloActions.length;
+    if (randomNum >= remainingOptions) { // Single
+      var actionIndex = getRandomInt(0, soloActions.length);
+      buildResponse(context, "If you have, " + 
+        getRandomCard(suits, ranks) + ", " + soloActions[actionIndex] + 
+        ". Next?", false);
+    }
+    remainingOptions = remainingOptions - doubleActions.length;
+    if (randomNum >= remainingOptions) { // Double
+      var actionIndex = getRandomInt(0, doubleActions.length); 
+      buildResponse(context, "If you have, " + 
+        getRandomCard(suits, ranks) + ", " + doubleActions[actionIndex] + 
+        " the person who has " + getRandomCard(suits, ranks) + ". Next?", false);
+    }
+    remainingOptions = remainingOptions - groupActions.length;
+    if (randomNum >= remainingOptions) { // Group
+      var actionIndex = getRandomInt(0, groupActions.length); 
+      buildResponse(context, groupActions[actionIndex] + " Next?", false);
+    }
+    remainingOptions = remainingOptions - miniGameActions.length;
+    if (randomNum >= remainingOptions) { // Versus
+      var actionIndex = getRandomInt(0, miniGameActions.length);
+      buildResponse(context, "Loser drinks! The person who has " + getRandomCard(suits, ranks) + 
+        ", " + miniGameActions[actionIndex] + " the person who has " + 
+        getRandomCard(suits, ranks) + ". Next?", false);
+    }
 }
