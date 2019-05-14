@@ -2,58 +2,7 @@ exports.handler = (event, context) => {
 
   try {
     var session = event.session;
-    var suits = ["spades", "hearts", "clubs", "diamonds"];
-    var ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King", "Ace"];
-    var soloActions = [
-      "stand up",
-      "squat for 15 seconds or drink",
-      "sit down",
-      "do 5 push ups or drink",
-      "do 5 crunches or drink",
-      "drink with anyone you choose",
-      "drink",
-      "remain silent for three rounds",
-      "pick a person to mute for three rounds",
-      "do 5 jumping jacks or drink",
-      "drink if you have an ace",
-      "give your aces to anyone you choose",
-      "spin yourself around 5 times"
-    ];
-    var doubleActions = [
-      "slap",
-      "drink with",
-      "swap drinks with",
-      "jump with",
-      "dab with",
-      "make a toast and drink with",
-      "dance with",
-      "give a ten second back massage to",
-      "high five with",
-      "take one random card from",
-      "take a selfie with",
-      "swap places with",
-      "swap hands with",
-      "give one of your cards to"
-    ];
-    var groupActions = [
-      "Everyone drink!",
-      "Everyone drink!",
-      "Everyone standing, drink!",
-      "Everyone sitting, drink!",
-      "Last one who does this drinks. 3, 2, 1, Jump!",
-      "Last one who does this drinks. 3, 2, 1, Clap!",
-      "Last one who does this drinks. 3, 2, 1, Squat!",
-      "Last one who does this drinks. 3, 2, 1, Touch your nose!",
-      "Last one who does this drinks. 3, 2, 1, Touch the ground!",
-      "Last one who does this drinks. 3, 2, 1, Touch your feet!",
-      "Drink for every Ace in your hand and give your Aces to someone else."
-    ];
-    var miniGameActions = [
-      "Play rock, paper, scissors versus",
-      "Play red hands versus",
-      "Play thumb wars versus",
-      "Enter a staring contest versus"
-    ];
+    
     if (event.session.new) {
       // New Session
       console.log("NEW SESSION")
@@ -287,10 +236,12 @@ function handleYesIntent(self, inSkillProductList) {
         console.log("Something went wrong in loading product list.");
     }
     // Do something with the retrieved product list
-    for (var idx = 0; idx < inSkillProductList.length; idx ++)   {
-        console.log("inSkillProductList[" + idx + "] is:" + JSON.stringify(inSkillProductList[idx]));
-    }
+    var hasPremiumRules = inSkillProductList[0]['entitled'] === "ENTITLED";
+    console.log("Premium?: " + hasPremiumRules);
     var totalOptions = soloActions.length + doubleActions.length + groupActions.length + miniGameActions.length;
+    if (hasPremiumRules) {
+      totalOptions += premiumActions.length;
+    }
 
     var randomNum = getRandomInt(0, totalOptions);
     var remainingOptions = totalOptions - soloActions.length;
@@ -319,4 +270,69 @@ function handleYesIntent(self, inSkillProductList) {
         ", " + miniGameActions[actionIndex] + " the person who has " + 
         getRandomCard(suits, ranks) + ". Next?", false);
     }
+    remainingOptions = remainingOptions - premiumActions.length;
+    if (randomNum >= remainingOptions) { // Versus
+      var actionIndex = getRandomInt(0, premiumActions.length);
+      buildResponse(context, "New rule set: " + premiumActions[actionIndex] + ". Next?", false);
+    }
 }
+
+const suits = ["spades", "hearts", "clubs", "diamonds"];
+const ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King", "Ace"];
+const soloActions = [
+  "stand up",
+  "squat for 15 seconds or drink",
+  "sit down",
+  "do 5 push ups or drink",
+  "do 5 crunches or drink",
+  "drink with anyone you choose",
+  "drink",
+  "remain silent for three rounds",
+  "pick a person to mute for three rounds",
+  "do 5 jumping jacks or drink",
+  "drink if you have an ace",
+  "give your aces to anyone you choose",
+  "spin yourself around 5 times"
+];
+const doubleActions = [
+  "slap",
+  "drink with",
+  "swap drinks with",
+  "jump with",
+  "dab with",
+  "make a toast and drink with",
+  "dance with",
+  "give a ten second back massage to",
+  "high five with",
+  "take one random card from",
+  "take a selfie with",
+  "swap places with",
+  "swap hands with",
+  "give one of your cards to"
+];
+const groupActions = [
+  "Everyone drink!",
+  "Everyone drink!",
+  "Everyone standing, drink!",
+  "Everyone sitting, drink!",
+  "Last one who does this drinks. 3, 2, 1, Jump!",
+  "Last one who does this drinks. 3, 2, 1, Clap!",
+  "Last one who does this drinks. 3, 2, 1, Squat!",
+  "Last one who does this drinks. 3, 2, 1, Touch your nose!",
+  "Last one who does this drinks. 3, 2, 1, Touch the ground!",
+  "Last one who does this drinks. 3, 2, 1, Touch your feet!",
+  "Drink for every Ace in your hand and give your Aces to someone else."
+];
+const miniGameActions = [
+  "Play rock, paper, scissors versus",
+  "Play red hands versus",
+  "Play thumb wars versus",
+  "Enter a staring contest versus."
+];
+const premiumActions = [
+  "The word 'drink' is forbidden. If someone says the word 'drink', they have to take a sip.",
+  "First names are forbidden. If you call someone by their first name you have to take a sip.",
+  "The last person who took a drink is now muted. If they speak to anyone they have to take a sip.",
+  "The last person who took a drink is now the question master. Anyone who answers a question posed by the target has to take a sip.",
+  "Everyone has to touch their nose before drinking. If you forget, you have to take two sips."
+];
