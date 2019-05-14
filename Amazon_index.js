@@ -204,7 +204,10 @@ buildReprompt = (context, output) => {
 }
 
 function getProductsAndEntitlements(self, callback) {
-// Invoke the entitlement API to load products only if not already cached
+    if (self.attributes.areProductsLoaded === undefined) {
+      self.attributes.areProductsLoaded = false;
+    }
+    // Invoke the entitlement API to load products only if not already cached
     if (!self.attributes.areProductsLoaded)    {
         self.attributes.inSkillProducts = [];
         var returnData = [];
