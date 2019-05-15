@@ -63,7 +63,7 @@ exports.handler = (event, context) => {
           buildResponse(context,"Here is the first rule: " + premiumActions[0] + " Enjoy!", false);
         }
         else {
-          buildResponse(context,"Alright, maybe next time...", true);
+          buildResponse(context,"Alright, maybe next time... Say 'next' to keep playing.", false);
         }
         break;
       default:
@@ -278,7 +278,7 @@ function handleBuySkillItemIntent(event, context, inSkillProductList) {
   }
   else {
     if (!event.request.intent.slots.ProductName.value) {
-      buildResponse(context, "I have an expansion pack available called Party Game Plus. If you would like to buy it, say: Buy Party Game Plus.", false);
+      buildResponse(context, "I have an expansion pack available called Rules Pack. If you would like to buy it, say: Buy Rules Pack.", false);
     }
     else {
       context.succeed({
