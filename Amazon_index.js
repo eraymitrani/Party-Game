@@ -33,29 +33,10 @@ exports.handler = (event, context) => {
             getProductsAndEntitlements(event, context, handleNoIntent);
             break;
           case "BuySkillItemIntent":
-            if (!event.request.intent.slots.ProductName.value) {
-              buildResponse(context, "I have an expansion pack available called Party Game Plus. If you would like to buy it, say: Buy Party Game Plus.", false);
-            }
-            else {
-              context.succeed( {
-                version: '1.0',
-                response: {
-                  directives: [
-                    {
-                      type: 'Connections.SendRequest',
-                      name: 'Buy',
-                      payload: {
-                        InSkillProduct: {
-                          productId: 'amzn1.adg.product.4a967b61-6d2c-4f83-97f9-c97a6aa7bd7a'
-                        }
-                      },
-                      token: 'someRandomCorrelationToken'
-                    }
-                  ],
-                  shouldEndSession: true
-                }
-              });
-            }
+            getProductsAndEntitlements(event, context, handleBuySkillItemIntent);
+            break;
+          case "WhatDidIBuyIntent":
+            getProductsAndEntitlements(event, context, handleWhatDidIBuyIntent);
             break;
           case "AMAZON.HelpIntent":
             getProductsAndEntitlements(event, context, handleHelpIntent);
@@ -229,7 +210,7 @@ function handleYesIntent(self, context, inSkillProductList) {
     console.log("Premium?: " + hasPremiumRules);
     var totalOptions = soloActions.length + doubleActions.length + groupActions.length + miniGameActions.length;
     if (hasPremiumRules) {
-      totalOptions += premiumActions.length*4;
+      totalOptions += premiumActions.length*2;
     }
 
     var randomNum = getRandomInt(0, totalOptions);
@@ -259,7 +240,7 @@ function handleYesIntent(self, context, inSkillProductList) {
         ", " + miniGameActions[actionIndex] + " the person who has " + 
         getRandomCard(suits, ranks) + ". Next?", false);
     }
-    remainingOptions = remainingOptions - premiumActions.length*4;
+    remainingOptions = remainingOptions - premiumActions.length*2;
     if (randomNum >= remainingOptions) { // Versus
       var actionIndex = getRandomInt(0, premiumActions.length);
       buildResponse(context, "New rule set: " + premiumActions[actionIndex] + " Next?", false);
@@ -284,6 +265,56 @@ function handleNoIntent(self, context, inSkillProductList) {
   }
   var randomNum = getRandomInt(0, exitResponses.length);
   buildResponse(context, exitResponses[randomNum], true);
+}
+
+function handleBuySkillItemIntent(self, context, inSkillProductList) {
+  if (!inSkillProductList)    {
+    console.log("Something went wrong in loading product list.");
+  }
+  var hasPremiumRules = inSkillProductList[0]['entitled'] === "ENTITLED";
+  if (hasPremiumRules) {
+    buildResponse(context, "You already have all the expansion I have available.", false);
+  }
+  else {
+    if (!event.request.intent.slots.ProductName.value) {
+      buildResponse(context, "I have an expansion pack available called Party Game Plus. If you would like to buy it, say: Buy Party Game Plus.", false);
+    }
+    else {
+      context.succeed({
+        version: '1.0',
+        response: {
+          directives: [
+            {
+              type: 'Connections.SendRequest',
+              name: 'Buy',
+              payload: {
+                InSkillProduct: {
+                  productId: 'amzn1.adg.product.4a967b61-6d2c-4f83-97f9-c97a6aa7bd7a'
+                }
+              },
+              token: 'someRandomCorrelationToken'
+            }
+          ],
+          shouldEndSession: true
+        }
+      });
+    }
+  }
+}
+
+function handleWhatDidIBuyIntent(self, context, inSkillProductList) {
+  if (!inSkillProductList)    {
+    console.log("Something went wrong in loading product list.");
+  }
+
+  var hasPremiumRules = inSkillProductList[0]['entitled'] === "ENTITLED";
+  if (hasPremiumRules) {
+    buildResponse(context, "You have purchased the Rules Pack expansion.", false);
+  }
+  else {
+    buildResponse(context, "You have no purchased expansions at the moment.", false);
+  }
+
 }
 
 function handleHelpIntent(self, context, inSkillProductList) {
