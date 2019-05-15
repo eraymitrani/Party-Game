@@ -2,6 +2,7 @@ exports.handler = (event, context) => {
 
   try {
     var session = event.session;
+    event.attributes = [];
     
     if (event.session.new) {
       // New Session
@@ -26,20 +27,10 @@ exports.handler = (event, context) => {
 
         switch(event.request.intent.name) {
           case "AMAZON.YesIntent":
-            event.attributes = [];
             getProductsAndEntitlements(event, context, handleYesIntent);
             break;
           case "AMAZON.NoIntent":
-            var exitResponses = [
-              "Launch me again when you are ready!",
-              "Thanks for playing!",
-              "Thanks! If you enjoyed playing please rate me in the Alexa app.",
-              "See you next time!",
-              "Hope to see you again soon!",
-              "Alright, I wish you had fun!"
-            ];
-            var randomNum = getRandomInt(0, exitResponses.length);
-            buildResponse(context, exitResponses[randomNum], true);
+            getProductsAndEntitlements(event, context, handleNoIntent);
             break;
           case "BuySkillItemIntent":
             if (!event.request.intent.slots.ProductName.value) {
@@ -67,10 +58,8 @@ exports.handler = (event, context) => {
             }
             break;
           case "AMAZON.HelpIntent":
-            buildResponse(context, "Deal an entire deck of cards to all players. " +
-              "Wait for everyone to sort their hands and sit down. " + 
-              "When you are ready, say launch Party Game and follow the instructions. " + 
-              "Have fun!", false);
+            getProductsAndEntitlements(event, context, handleHelpIntent);
+            
             break;
           case "AMAZON.CancelIntent":
             buildResponse(context,"",true);
@@ -89,10 +78,10 @@ exports.handler = (event, context) => {
         break;
       case "Connections.Response":
         if (event.request.payload.purchaseResult === "ACCEPTED") {
-          buildResponse(context,"Expansions unlocked!",true);
+          buildResponse(context,"Expansion unlocked! Here is the first rule: " + premiumActions[0] + " Enjoy!", false);
         }
         else {
-          buildResponse(context,"No expansions for you!",true);
+          buildResponse(context,"Alright, maybe next time...", true);
         }
         break;
       default:
@@ -275,6 +264,42 @@ function handleYesIntent(self, context, inSkillProductList) {
       var actionIndex = getRandomInt(0, premiumActions.length);
       buildResponse(context, "New rule set: " + premiumActions[actionIndex] + " Next?", false);
     }
+}
+
+function handleNoIntent(self, context, inSkillProductList) {
+  if (!inSkillProductList)    {
+    console.log("Something went wrong in loading product list.");
+  }
+  var hasPremiumRules = inSkillProductList[0]['entitled'] === "ENTITLED";
+  var exitResponses = [
+    "Launch me again when you are ready!",
+    "Thanks for playing!",
+    "Thanks! If you enjoyed playing please rate me in the Alexa app.",
+    "See you next time!",
+    "Hope to see you again soon!",
+    "Alright, I wish you had fun!"
+  ];
+  if (!hasPremiumRules) {
+    exitResponses.push("You might want to give our premium expansion pack a try next time!");
+  }
+  var randomNum = getRandomInt(0, exitResponses.length);
+  buildResponse(context, exitResponses[randomNum], true);
+}
+
+function handleHelpIntent(self, context, inSkillProductList) {
+  if (!inSkillProductList)    {
+    console.log("Something went wrong in loading product list.");
+  }
+
+  var hasPremiumRules = inSkillProductList[0]['entitled'] === "ENTITLED";
+  var helpMessage = "Deal an entire deck of cards to all players. " +
+                    "Wait for everyone to sort their hands and sit down. " + 
+                    "When you are ready, say launch Party Game and follow the instructions. ";
+  if (hasPremiumRules) {
+      helpMessage += "The premium pack adds a single master rule until a new one is set." + 
+                     "Call on anyone that forgets the rule and make them drink.";
+  }
+  buildResponse(context, helpMessage + " Have fun!", false);
 }
 
 const suits = ["spades", "hearts", "clubs", "diamonds"];
