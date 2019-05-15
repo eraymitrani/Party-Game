@@ -27,7 +27,7 @@ exports.handler = (event, context) => {
         switch(event.request.intent.name) {
           case "AMAZON.YesIntent":
             event.attributes = [];
-            getProductsAndEntitlements(event, handleYesIntent);
+            getProductsAndEntitlements(event, context, handleYesIntent);
             break;
           case "AMAZON.NoIntent":
             var exitResponses = [
@@ -152,7 +152,7 @@ buildReprompt = (context, output) => {
   );
 }
 
-function getProductsAndEntitlements(event, callback) {
+function getProductsAndEntitlements(event, context, callback) {
   console.log(event);
     if (event.attributes.areProductsLoaded === undefined) {
       event.attributes.areProductsLoaded = false;
@@ -204,7 +204,7 @@ function getProductsAndEntitlements(event, callback) {
                     event.attributes.InSkillProducts=[];
 
                 console.log("Product list loaded:" + JSON.stringify(event.attributes.InSkillProducts));
-                callback(event, event.attributes.InSkillProducts);
+                callback(event, context, event.attributes.InSkillProducts);
             });   
         });
 
@@ -216,7 +216,7 @@ function getProductsAndEntitlements(event, callback) {
     } // End if (!self.attributes.areProductsLoaded) {}
     else    {
         console.log("Product info already loaded.");
-        callback(event, event.attributes.InSkillProducts);
+        callback(event, context, event.attributes.InSkillProducts);
         return;
     }
 }
@@ -231,7 +231,7 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function handleYesIntent(self, inSkillProductList) {
+function handleYesIntent(self, context, inSkillProductList) {
     if (!inSkillProductList)    {
         console.log("Something went wrong in loading product list.");
     }
@@ -273,7 +273,7 @@ function handleYesIntent(self, inSkillProductList) {
     remainingOptions = remainingOptions - premiumActions.length;
     if (randomNum >= remainingOptions) { // Versus
       var actionIndex = getRandomInt(0, premiumActions.length);
-      buildResponse(context, "New rule set: " + premiumActions[actionIndex] + ". Next?", false);
+      buildResponse(context, "New rule set: " + premiumActions[actionIndex] + " Next?", false);
     }
 }
 
