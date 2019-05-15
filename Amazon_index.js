@@ -268,7 +268,7 @@ function handleNoIntent(self, context, inSkillProductList) {
   buildResponse(context, exitResponses[randomNum], true);
 }
 
-function handleBuySkillItemIntent(self, context, inSkillProductList) {
+function handleBuySkillItemIntent(event, context, inSkillProductList) {
   if (!inSkillProductList)    {
     console.log("Something went wrong in loading product list.");
   }
