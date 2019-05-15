@@ -60,7 +60,7 @@ exports.handler = (event, context) => {
         break;
       case "Connections.Response":
         if (event.request.payload.purchaseResult === "ACCEPTED") {
-          buildResponse(context,"Expansion unlocked! Here is the first rule: " + premiumActions[0] + " Enjoy!", false);
+          buildResponse(context,"Here is the first rule: " + premiumActions[0] + " Enjoy!", false);
         }
         else {
           buildResponse(context,"Alright, maybe next time...", true);
