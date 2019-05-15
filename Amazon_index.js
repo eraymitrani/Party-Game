@@ -14,9 +14,10 @@ exports.handler = (event, context) => {
       case "LaunchRequest":
         // Launch Request
         console.log(`LAUNCH REQUEST`);
+
         context.succeed(
           generateResponse(
-            buildSpeechletResponse("Party Game! Are you ready to test?", false)
+            buildSpeechletResponse("Party Game! Are you ready?", false)
           )
         );
         break;
@@ -273,7 +274,7 @@ function handleBuySkillItemIntent(self, context, inSkillProductList) {
   }
   var hasPremiumRules = inSkillProductList[0]['entitled'] === "ENTITLED";
   if (hasPremiumRules) {
-    buildResponse(context, "You already have all the expansion I have available.", false);
+    buildResponse(context, "You already have all the expansions I have available.", false);
   }
   else {
     if (!event.request.intent.slots.ProductName.value) {
