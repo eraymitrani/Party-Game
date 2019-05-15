@@ -240,7 +240,7 @@ function handleYesIntent(self, context, inSkillProductList) {
     console.log("Premium?: " + hasPremiumRules);
     var totalOptions = soloActions.length + doubleActions.length + groupActions.length + miniGameActions.length;
     if (hasPremiumRules) {
-      totalOptions += premiumActions.length;
+      totalOptions += premiumActions.length*4;
     }
 
     var randomNum = getRandomInt(0, totalOptions);
@@ -270,7 +270,7 @@ function handleYesIntent(self, context, inSkillProductList) {
         ", " + miniGameActions[actionIndex] + " the person who has " + 
         getRandomCard(suits, ranks) + ". Next?", false);
     }
-    remainingOptions = remainingOptions - premiumActions.length;
+    remainingOptions = remainingOptions - premiumActions.length*4;
     if (randomNum >= remainingOptions) { // Versus
       var actionIndex = getRandomInt(0, premiumActions.length);
       buildResponse(context, "New rule set: " + premiumActions[actionIndex] + " Next?", false);
