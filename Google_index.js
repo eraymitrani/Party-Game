@@ -46,6 +46,10 @@ var ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King", "Ace"];
       "Last one who does this drinks. 3, 2, 1, Clap!",
       "Last one who does this drinks. 3, 2, 1, Squat!",
       "Last one who does this drinks. 3, 2, 1, Touch your nose!",
+      "Last one who does this drinks. 3, 2, 1, Touch your arm!",
+      "Last one who does this drinks. 3, 2, 1, Touch the person to your right!",
+      "Last one who does this drinks. 3, 2, 1, Touch the person to your left!",
+      "Last one who does this drinks. 3, 2, 1, Snap fingers.",
       "Last one who does this drinks. 3, 2, 1, Touch the ground!",
       "Last one who does this drinks. 3, 2, 1, Touch your feet!",
       "Drink for every Ace in your hand and give your Aces to someone else."
@@ -55,6 +59,7 @@ var ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King", "Ace"];
       "Play red hands versus",
       "Play thumb wars versus",
       "Enter a staring contest versus"
+      
     ];
 //var recent = 'Play a round first.';
 
